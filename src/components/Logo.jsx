@@ -1,0 +1,11 @@
+export default function Logo({ color = '#c1272d', height = 24 }) {
+  return (
+    <svg viewBox="0 0 120 70" style={{ height, width: 'auto' }} aria-hidden="true">
+      <g fill={color}>
+        <polygon points="6,46 44,46 30,62 6,62" />
+        <polygon points="20,30 58,30 70,30 56,46 18,46" />
+        <polygon points="44,14 82,14 68,30 30,30" />
+      </g>
+    </svg>
+  )
+}

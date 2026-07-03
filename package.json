@@ -1,0 +1,26 @@
+{
+  "name": "tms-website",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "TMS — Technology for Manufacturing Solutions. Egypt's industrial steel and stainless-steel manufacturing partner.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/anton": "^5.2.7",
+    "@fontsource/archivo": "^5.2.8",
+    "@fontsource/archivo-black": "^5.2.8",
+    "@fontsource/cairo": "^5.2.7",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.8"
+  }
+}
