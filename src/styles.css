@@ -940,3 +940,29 @@ header.scrolled{background:rgba(255,255,255,.78);backdrop-filter:blur(18px) satu
   .values-grid{grid-template-columns:1fr}
 }
 
+/* ============================================================
+   HORIZONTAL SLIDER — cross-sector edge cards (scroll-snap)
+   ============================================================ */
+.xslider{
+  display:flex;gap:24px;overflow-x:auto;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  padding-bottom:18px;
+  scrollbar-width:thin;scrollbar-color:var(--red) var(--line);
+}
+.xslider::-webkit-scrollbar{height:8px}
+.xslider::-webkit-scrollbar-track{background:var(--line);border-radius:4px}
+.xslider::-webkit-scrollbar-thumb{background:var(--red);border-radius:4px}
+.xslide{
+  scroll-snap-align:start;flex:0 0 clamp(280px,32%,400px);
+  background:#fff;border:1px solid var(--line);padding:32px;
+  transition:border-color .3s,transform .3s;
+}
+.xslide:hover{border-color:var(--red);transform:translateY(-4px)}
+.xslide h4{font-family:var(--black);font-size:19px;margin-bottom:12px;color:var(--ink)}
+.xslide p{color:var(--grey);font-size:14px;line-height:1.6}
+[dir="rtl"] .xslide h4,[dir="rtl"] .xslide p{text-align:right}
+/* On phones each card takes most of the width so it reads as a swipeable slider */
+@media(max-width:680px){
+  .xslide{flex:0 0 82%}
+}
+

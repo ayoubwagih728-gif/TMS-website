@@ -85,25 +85,17 @@ export default function Sectors() {
       <section className="content-block">
         <div className="wrap">
           <Reveal className="sec-head"><span className="idx">{t.idxEdge}</span><h2 className="ht" dangerouslySetInnerHTML={{ __html: t.edgeHeading }} /></Reveal>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:24}}>
-            <Reveal>
-              <div style={{background:'#fff',border:'1px solid var(--line)',padding:32}}>
-                <h4 style={{fontFamily:'var(--black)',fontSize:19,marginBottom:12,color:'var(--ink)'}}>{t.card1Title}</h4>
-                <p style={{color:'var(--grey)',fontSize:14,lineHeight:1.6}}>{t.card1Body}</p>
-              </div>
-            </Reveal>
-            <Reveal delay={100}>
-              <div style={{background:'#fff',border:'1px solid var(--line)',padding:32}}>
-                <h4 style={{fontFamily:'var(--black)',fontSize:19,marginBottom:12,color:'var(--ink)'}}>{t.card2Title}</h4>
-                <p style={{color:'var(--grey)',fontSize:14,lineHeight:1.6}}>{t.card2Body}</p>
-              </div>
-            </Reveal>
-            <Reveal delay={200}>
-              <div style={{background:'#fff',border:'1px solid var(--line)',padding:32}}>
-                <h4 style={{fontFamily:'var(--black)',fontSize:19,marginBottom:12,color:'var(--ink)'}}>{t.card3Title}</h4>
-                <p style={{color:'var(--grey)',fontSize:14,lineHeight:1.6}}>{t.card3Body}</p>
-              </div>
-            </Reveal>
+          <div className="xslider">
+            {[
+              { h: t.card1Title, p: t.card1Body },
+              { h: t.card2Title, p: t.card2Body },
+              { h: t.card3Title, p: t.card3Body },
+            ].map((c, i) => (
+              <Reveal className="xslide" delay={i * 100} key={i}>
+                <h4>{c.h}</h4>
+                <p>{c.p}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
