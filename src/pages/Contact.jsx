@@ -289,7 +289,7 @@ export default function Contact() {
                 <button type="submit" className="btn" disabled={sending} aria-busy={sending}>
                   {sending ? t.sendingBtn : t.sendBtn}
                 </button>
-                <p className="form-note">{t.formNote} {company.email} · {company.phone}</p>
+                <p className="form-note">{t.formNote} {company.email} · <bdi className="tel-ltr">{company.phone}</bdi></p>
               </form>
             )}
           </Reveal>
@@ -303,7 +303,7 @@ export default function Contact() {
             <div className="ct-rows">
               <a className="ct-row" href={`tel:${company.phoneIntl}`}>
                 <span className="ico"><Icon.Phone /></span>
-                <div><div className="lab">{t.labelCall}</div><div className="val">{company.phone}</div></div>
+                <div><div className="lab">{t.labelCall}</div><div className="val"><bdi className="tel-ltr">{company.phone}</bdi></div></div>
               </a>
               <a className="ct-row" href={`mailto:${company.email}`}>
                 <span className="ico"><Icon.Mail /></span>
@@ -311,7 +311,7 @@ export default function Contact() {
               </a>
               <a className="ct-row" href={`https://wa.me/${company.whatsapp}`} target="_blank" rel="noopener">
                 <span className="ico"><Icon.Whatsapp /></span>
-                <div><div className="lab">{t.labelWhatsapp}</div><div className="val">{company.phone}</div></div>
+                <div><div className="lab">{t.labelWhatsapp}</div><div className="val"><bdi className="tel-ltr">{company.phone}</bdi></div></div>
               </a>
               <div className="ct-row">
                 <span className="ico"><Icon.Pin /></span>

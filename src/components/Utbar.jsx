@@ -10,7 +10,7 @@ export default function Utbar() {
     <div className="utbar">
       <div className="wrap">
         <div className="utleft">
-          <a className="ut-phone" href={`tel:${company.phoneIntl}`}><Icon.Phone /> {company.phone}</a>
+          <a className="ut-phone" href={`tel:${company.phoneIntl}`}><Icon.Phone /> <bdi className="tel-ltr">{company.phone}</bdi></a>
           <a className="ut-email" href={`mailto:${company.email}`}><Icon.Mail /> {company.email}</a>
         </div>
         <div className="utright">

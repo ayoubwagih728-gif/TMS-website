@@ -61,7 +61,7 @@ export default function Footer() {
           </div>
           <div className="foot-col">
             <h5>{t.touch}</h5>
-            <a href={`tel:${company.phoneIntl}`}>{company.phone}</a>
+            <a href={`tel:${company.phoneIntl}`}><bdi className="tel-ltr">{company.phone}</bdi></a>
             <a href={`mailto:${company.email}`}>{company.email}</a>
             <p>{company.web}</p>
             <p>{company.city}</p>

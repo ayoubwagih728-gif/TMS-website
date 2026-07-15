@@ -129,7 +129,7 @@ export default function Header() {
           {/* Drawer footer — mobile only */}
           <div className="drawer-foot">
             <a className="df-call" href={`tel:${company.phoneIntl}`}>
-              <Icon.Phone /> {company.phone}
+              <Icon.Phone /> <bdi className="tel-ltr">{company.phone}</bdi>
             </a>
             <button className="df-lang" onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar') }}>
               <Icon.Globe /> {t.lang}
