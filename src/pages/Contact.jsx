@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { Reveal, Icon } from '../components/ui.jsx'
@@ -31,6 +31,7 @@ const TXT = {
     errMessage: 'Please add a few details about your project.',
     errSend: "Sorry — we couldn't send your message. Please try again, or email us directly.",
     errConfig: 'The contact form is not configured yet. Please email us directly for now.',
+    errThrottle: 'Please wait a few seconds before sending again.',
     sendAnother: 'Send another request',
     labelName: 'Your name',
     labelCompany: 'Company',
@@ -88,6 +89,7 @@ const TXT = {
     errMessage: 'من فضلك أضف بعض التفاصيل عن مشروعك.',
     errSend: 'عذرًا — تعذّر إرسال رسالتك. حاول مرة أخرى، أو راسلنا مباشرة.',
     errConfig: 'نموذج التواصل غير مُهيّأ بعد. من فضلك راسلنا مباشرة في الوقت الحالي.',
+    errThrottle: 'من فضلك انتظر بضع ثوانٍ قبل الإرسال مرة أخرى.',
     sendAnother: 'إرسال طلب آخر',
     labelName: 'الاسم',
     labelCompany: 'الشركة',
@@ -140,7 +142,9 @@ export default function Contact() {
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState({ name:'', company:'', email:'', phone:'', service:'', message:'' })
+  // `website` is a honeypot — hidden from real users; only bots fill it.
+  const [form, setForm] = useState({ name:'', company:'', email:'', phone:'', service:'', message:'', website:'' })
+  const lastSentAt = useRef(0)  // throttle: block rapid repeat submissions
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -157,6 +161,14 @@ export default function Contact() {
   const onSubmit = async (e) => {
     e.preventDefault()          // AJAX submit — no page reload / redirect
     setError('')
+
+    // Honeypot: a real user never sees/fills `website`. If it's set, it's a bot —
+    // silently pretend success and send nothing.
+    if (form.website) { setSent(true); return }
+
+    // Throttle: ignore submissions fired less than 10s apart (bot hammering / double-click).
+    const now = Date.now()
+    if (now - lastSentAt.current < 10000) { setError(t.errThrottle); return }
 
     const validationError = validate()
     if (validationError) { setError(validationError); return }
@@ -216,8 +228,9 @@ export default function Contact() {
         }
       }
 
+      lastSentAt.current = Date.now()
       setSent(true)
-      setForm({ name:'', company:'', email:'', phone:'', service:'', message:'' })
+      setForm({ name:'', company:'', email:'', phone:'', service:'', message:'', website:'' })
     } catch (err) {
       console.error('EmailJS send failed:', err)
       setError(t.errSend)
@@ -253,6 +266,17 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={onSubmit} noValidate>
+                {/* Honeypot — hidden from users; bots that fill it are silently rejected. */}
+                <input
+                  type="text"
+                  name="website"
+                  value={form.website}
+                  onChange={onChange}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position:'absolute', left:'-9999px', width:1, height:1, opacity:0 }}
+                />
                 <div className="frow">
                   <div className="field">
                     <label htmlFor="name">{t.labelName}</label>

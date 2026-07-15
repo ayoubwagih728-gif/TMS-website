@@ -83,6 +83,49 @@ gets its own **preview URL**.
 
 ---
 
+## Security
+
+This is a **static site** — there is no server, database, admin panel, or user login to
+break into. The attack surface is the browser delivery and the public contact form, and
+both are hardened:
+
+**HTTP security headers** (`vercel.json`, applied to every response):
+- **Content-Security-Policy** — locks resource loading to this origin only. Scripts run
+  from `'self'` (no inline scripts), the form may talk only to `https://api.emailjs.com`,
+  and `frame-ancestors 'none'` blocks clickjacking.
+- **Strict-Transport-Security (HSTS)** — forces HTTPS for a year.
+- **X-Content-Type-Options: nosniff**, **X-Frame-Options: DENY**,
+  **Referrer-Policy: strict-origin-when-cross-origin**,
+  **Permissions-Policy** (camera/mic/geolocation/payment disabled),
+  **Cross-Origin-Opener-Policy: same-origin**.
+
+> After the first deploy, open DevTools → Console and confirm there are **no CSP violation
+> warnings**. If you later add a new external resource (analytics, a map embed, a CDN font),
+> you must add its domain to the matching CSP directive in `vercel.json` or it will be blocked.
+
+**Contact form abuse protection:**
+- A **honeypot** field silently rejects bots.
+- A **submit throttle** blocks rapid repeat sends.
+- The EmailJS **public key is the only exposed credential and is safe by design** — it can
+  only trigger your specific template, never read your account.
+
+**Required EmailJS dashboard hardening** (do these — code can't set them):
+1. **Account → Security → Allow list**: add your production domain(s) so the public key only
+   works from your site, not from someone else's page.
+2. **Template → enable reCAPTCHA** (or EmailJS's built-in bot check) to stop automated sends.
+3. Set/confirm the account **rate limit** so a flood of requests is capped.
+
+**Dependencies:**
+- `package-lock.json` pins exact versions; CI installs with `npm ci` (no drift).
+- **Dependabot** (`.github/dependabot.yml`) opens PRs for vulnerable/outdated packages weekly.
+- The current `npm audit` warnings are **dev-only** (esbuild/vite dev server) and do **not**
+  affect the deployed static files.
+
+**Secrets:** none are committed. `.env` is gitignored; on Vercel the values live in
+Environment Variables. Never commit a private key or mailbox password.
+
+---
+
 ## Project structure
 
 ```
