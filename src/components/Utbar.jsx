@@ -14,8 +14,8 @@ export default function Utbar() {
           <a className="ut-email" href={`mailto:${company.email}`}><Icon.Mail /> {company.email}</a>
         </div>
         <div className="utright">
-          <a href="https://linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon.LinkedIn /></a>
-          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><Icon.Facebook /></a>
+          <a href="https://www.linkedin.com/company/tms-misr/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon.LinkedIn /></a>
+          <a href="https://www.facebook.com/tms.misr/" target="_blank" rel="noopener" aria-label="Facebook"><Icon.Facebook /></a>
           <a href={`https://wa.me/${company.whatsapp}`} target="_blank" rel="noopener" aria-label="WhatsApp"><Icon.Whatsapp /></a>
           <span className="sep"></span>
           <button type="button" className="lang" onClick={toggle} aria-label="Switch language">

@@ -377,6 +377,8 @@ footer{background:var(--red-deep);color:#fff;padding:60px 0 32px}
 .ct-form button{width:100%;justify-content:center}
 .form-note{margin-top:14px;font-size:12px;color:var(--grey-2);text-align:center}
 .form-ok{background:var(--red);color:#fff;padding:16px;text-align:center;font-weight:600;margin-top:18px}
+.form-err{background:var(--red-tint);border:1px solid var(--red);color:var(--red-deep);padding:12px 14px;font-size:14px;font-weight:600;margin-bottom:16px}
+.ct-form button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 .ct-info{display:flex;flex-direction:column}
 .ct-info .blurb{color:var(--grey);font-size:15px;line-height:1.7;margin-bottom:26px}
 .ct-rows{display:flex;flex-direction:column;border:1px solid var(--line)}

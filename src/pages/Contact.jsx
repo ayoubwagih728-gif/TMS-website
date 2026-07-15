@@ -1,8 +1,19 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import emailjs from '@emailjs/browser'
 import { Reveal, Icon } from '../components/ui.jsx'
 import Logo from '../components/Logo.jsx'
 import { useLang } from '../i18n.jsx'
+import {
+  EMAILJS_SERVICE_ID,
+  EMAILJS_TEMPLATE_ID,
+  EMAILJS_AUTOREPLY_TEMPLATE_ID,
+  EMAILJS_PUBLIC_KEY,
+  EMAILJS_TO_EMAIL,
+  EMAILJS_CONFIGURED,
+} from '../emailjs.config.js'
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const TXT = {
   en: {
@@ -14,6 +25,13 @@ const TXT = {
     formHeading: 'Request a quote',
     formSub: "Share the scope, your timeline and project location — we'll come back with a buildable plan and a price.",
     successMsg: "Thanks — your request has reached our engineering team. We'll be in touch within one business day.",
+    sendingBtn: 'Sending…',
+    errName: 'Please enter your name.',
+    errEmail: 'Please enter a valid email address.',
+    errMessage: 'Please add a few details about your project.',
+    errSend: "Sorry — we couldn't send your message. Please try again, or email us directly.",
+    errConfig: 'The contact form is not configured yet. Please email us directly for now.',
+    sendAnother: 'Send another request',
     labelName: 'Your name',
     labelCompany: 'Company',
     labelEmail: 'Email',
@@ -50,7 +68,7 @@ const TXT = {
     daySat: 'Saturday',
     dayFri: 'Friday',
     dayEmergency: 'Emergency response',
-    hoursSunThu: '9:00 – 18:00',
+    hoursSunThu: '9:00 – 17:00',
     hoursSat: '9:00 – 14:00',
     hoursFri: 'Closed',
     hoursEmergency: '24/7',
@@ -64,6 +82,13 @@ const TXT = {
     formHeading: 'اطلب عرض سعر',
     formSub: 'شاركنا نطاق العمل والجدول الزمني وموقع المشروع — وسنعود إليك بخطة قابلة للتنفيذ وسعر.',
     successMsg: 'شكرًا — وصل طلبك إلى فريقنا الهندسي. سنتواصل معك خلال يوم عمل واحد.',
+    sendingBtn: 'جارٍ الإرسال…',
+    errName: 'من فضلك أدخل اسمك.',
+    errEmail: 'من فضلك أدخل بريدًا إلكترونيًا صحيحًا.',
+    errMessage: 'من فضلك أضف بعض التفاصيل عن مشروعك.',
+    errSend: 'عذرًا — تعذّر إرسال رسالتك. حاول مرة أخرى، أو راسلنا مباشرة.',
+    errConfig: 'نموذج التواصل غير مُهيّأ بعد. من فضلك راسلنا مباشرة في الوقت الحالي.',
+    sendAnother: 'إرسال طلب آخر',
     labelName: 'الاسم',
     labelCompany: 'الشركة',
     labelEmail: 'البريد الإلكتروني',
@@ -100,7 +125,7 @@ const TXT = {
     daySat: 'السبت',
     dayFri: 'الجمعة',
     dayEmergency: 'الاستجابة الطارئة',
-    hoursSunThu: '9:00 – 18:00',
+    hoursSunThu: '9:00 – 17:00',
     hoursSat: '9:00 – 14:00',
     hoursFri: 'مغلق',
     hoursEmergency: '24/7',
@@ -113,15 +138,95 @@ export default function Contact() {
   const t = TXT[lang]
 
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const [form, setForm] = useState({ name:'', company:'', email:'', phone:'', service:'', message:'' })
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-  const onSubmit = (e) => {
-    e.preventDefault()
-    // wire to Formspree / EmailJS / your backend endpoint here
-    console.log('TMS quote request:', form)
-    setSent(true)
+  const onChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+    if (error) setError('')
   }
+
+  const validate = () => {
+    if (!form.name.trim()) return t.errName
+    if (!EMAIL_RE.test(form.email.trim())) return t.errEmail
+    if (!form.message.trim()) return t.errMessage
+    return ''
+  }
+
+  const onSubmit = async (e) => {
+    e.preventDefault()          // AJAX submit — no page reload / redirect
+    setError('')
+
+    const validationError = validate()
+    if (validationError) { setError(validationError); return }
+
+    if (!EMAILJS_CONFIGURED) { setError(t.errConfig); return }
+
+    // Fold the optional fields into the message body so nothing is lost.
+    const extras = [
+      form.company && `Company: ${form.company}`,
+      form.phone   && `Phone: ${form.phone}`,
+      form.service && `Service: ${form.service}`,
+    ].filter(Boolean).join('\n')
+    const fullMessage = extras ? `${form.message}\n\n---\n${extras}` : form.message
+    const title = form.service || 'Website inquiry'
+
+    // Template B — team notification (delivered to your Outlook inbox).
+    // Include several common variable names so it works whatever your template uses.
+    const notifyParams = {
+      to_email:   EMAILJS_TO_EMAIL, // template To Email = {{to_email}}
+      name:       form.name,
+      from_name:  form.name,
+      email:      form.email,
+      from_email: form.email,
+      reply_to:   form.email,       // lets you hit "Reply" straight to the sender
+      title,
+      message:    fullMessage,
+    }
+
+    // Template A — customer thank-you auto-reply (To Email = {{email}}).
+    const autoReplyParams = {
+      email: form.email,            // template To Email = {{email}} (the customer)
+      name:  form.name,
+      title,
+    }
+
+    setSending(true)
+    try {
+      // The team notification is the critical send — await and require success.
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        notifyParams,
+        { publicKey: EMAILJS_PUBLIC_KEY },
+      )
+
+      // The customer auto-reply is best-effort — a failure here shouldn't lose the lead.
+      if (EMAILJS_AUTOREPLY_TEMPLATE_ID) {
+        try {
+          await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_AUTOREPLY_TEMPLATE_ID,
+            autoReplyParams,
+            { publicKey: EMAILJS_PUBLIC_KEY },
+          )
+        } catch (autoErr) {
+          console.warn('Auto-reply send failed (notification still sent):', autoErr)
+        }
+      }
+
+      setSent(true)
+      setForm({ name:'', company:'', email:'', phone:'', service:'', message:'' })
+    } catch (err) {
+      console.error('EmailJS send failed:', err)
+      setError(t.errSend)
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const resetForm = () => { setSent(false); setError('') }
 
   return (
     <>
@@ -142,9 +247,12 @@ export default function Contact() {
             <h3>{t.formHeading}</h3>
             <p className="sub">{t.formSub}</p>
             {sent ? (
-              <div className="form-ok">{t.successMsg}</div>
+              <div>
+                <div className="form-ok">{t.successMsg}</div>
+                <button type="button" className="btn ghost" style={{marginTop:16}} onClick={resetForm}>{t.sendAnother}</button>
+              </div>
             ) : (
-              <form onSubmit={onSubmit}>
+              <form onSubmit={onSubmit} noValidate>
                 <div className="frow">
                   <div className="field">
                     <label htmlFor="name">{t.labelName}</label>
@@ -177,7 +285,10 @@ export default function Contact() {
                   <label htmlFor="message">{t.labelMessage}</label>
                   <textarea id="message" name="message" value={form.message} onChange={onChange} placeholder={t.messagePlaceholder} required></textarea>
                 </div>
-                <button type="submit" className="btn">{t.sendBtn}</button>
+                {error && <div className="form-err" role="alert">{error}</div>}
+                <button type="submit" className="btn" disabled={sending} aria-busy={sending}>
+                  {sending ? t.sendingBtn : t.sendBtn}
+                </button>
                 <p className="form-note">{t.formNote} {company.email} · {company.phone}</p>
               </form>
             )}
