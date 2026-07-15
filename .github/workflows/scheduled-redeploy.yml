@@ -1,0 +1,34 @@
+name: Scheduled redeploy (cache refresh)
+
+# OPTIONAL — forces a clean Vercel rebuild on a schedule so any build cache is
+# refreshed periodically. This is a safety net; the real staleness protection is
+# the cache-control headers in vercel.json (immutable hashed assets + no-cache
+# HTML), which already guarantee visitors get the latest build on every deploy.
+#
+# To enable:
+#   1. In Vercel: Project → Settings → Git → Deploy Hooks → create a hook for
+#      branch "main". Copy the URL.
+#   2. In GitHub: Repo → Settings → Secrets and variables → Actions → New secret
+#      named VERCEL_DEPLOY_HOOK_URL, paste the URL.
+# Until that secret exists, this workflow no-ops (it won't fail).
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # every Monday at 03:00 UTC
+  workflow_dispatch: {} # allows manual "Run workflow" from the Actions tab
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK_URL secret not set — skipping (this is fine)."
+            exit 0
+          fi
+          echo "Triggering Vercel redeploy…"
+          curl -fsSL -X POST "$HOOK"
+          echo "Done."

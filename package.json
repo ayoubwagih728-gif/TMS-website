@@ -4,6 +4,9 @@
   "version": "2.0.0",
   "type": "module",
   "description": "TMS — Technology for Manufacturing Solutions. Egypt's industrial steel and stainless-steel manufacturing partner.",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

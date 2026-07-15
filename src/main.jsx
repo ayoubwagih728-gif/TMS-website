@@ -19,14 +19,17 @@ import '@fontsource/cairo/900.css'
 
 import App from './App.jsx'
 import { LangProvider } from './i18n.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 import './styles.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <LangProvider>
-        <App />
-      </LangProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <LangProvider>
+          <App />
+        </LangProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 )

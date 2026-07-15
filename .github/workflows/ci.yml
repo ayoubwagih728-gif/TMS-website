@@ -1,0 +1,37 @@
+name: CI
+
+# Build the site on every push and pull request so a broken change is caught
+# before it ever reaches Vercel. If this job fails, the red X on the commit/PR
+# tells you exactly which change broke the build.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies (clean, from lockfile)
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
