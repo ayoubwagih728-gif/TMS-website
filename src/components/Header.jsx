@@ -66,7 +66,8 @@ export default function Header() {
     <header className={cls}>
       <div className="wrap nav">
         <Link to="/" className="brand" aria-label="TMS home">
-          <Logo />
+          {/* White logo while over the dark hero at the top; red once scrolled. */}
+          <Logo color={isHome && !scrolled ? '#fff' : '#c1272d'} />
           <span className="wordmark">TMS</span>
         </Link>
 

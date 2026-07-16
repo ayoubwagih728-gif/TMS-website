@@ -50,6 +50,7 @@ header.scrolled{background:rgba(255,255,255,.95);backdrop-filter:blur(14px);bord
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
 .brand{display:flex;align-items:center;gap:13px}
 .brand svg{height:24px;width:auto}
+.brand img{height:24px;width:auto;transition:filter .4s}
 .brand .wordmark{font-family:var(--black);font-size:20px;letter-spacing:.02em;color:var(--ink);line-height:1;transition:color .4s}
 .navlinks{display:flex;gap:28px;align-items:center}
 .navlinks > a, .navlinks > .has-mega > button{font-size:13px;font-weight:600;color:var(--ink);position:relative;transition:color .25s;background:none;border:none;cursor:pointer;padding:8px 0;display:inline-flex;align-items:center;gap:5px}
