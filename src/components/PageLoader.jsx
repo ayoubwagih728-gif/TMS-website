@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import logoUrl from '../assets/tms-logo.png'
 
 // ── Adjustable timings (ms) ──────────────────────────────────────────────
 // Tweak these to tune how long the loader stays up.
@@ -37,14 +38,7 @@ export default function PageLoader() {
     <div className={'pload' + (loading ? ' on' : '')} aria-hidden={!loading}>
       <div className="pload-bg"></div>
       <div className="pload-inner">
-        <svg className="pload-logo" viewBox="0 0 120 70" aria-label="TMS">
-          {/* Self-drawing: strokes draw in, then fill solid */}
-          <g>
-            <polygon points="6,46 44,46 30,62 6,62" className="pl-shape pl-1" />
-            <polygon points="20,30 58,30 70,30 56,46 18,46" className="pl-shape pl-2" />
-            <polygon points="44,14 82,14 68,30 30,30" className="pl-shape pl-3" />
-          </g>
-        </svg>
+        <img className="pload-logo" src={logoUrl} alt="TMS" />
         <div className="pload-bar"><div className="pload-bar-fill"></div></div>
         <div className="pload-text">TMS</div>
       </div>
