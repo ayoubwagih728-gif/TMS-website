@@ -24,7 +24,6 @@ export default function Header() {
   const [megaOpen, setMegaOpen] = useState(false)
   const closeTimer = useRef(null)
   const { pathname } = useLocation()
-  const isHome = pathname === '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -60,14 +59,17 @@ export default function Header() {
   }
   const closeDrawer = () => { setOpen(false); setMegaOpen(false) }
 
-  const cls = ['', isHome ? 'on-dark' : '', scrolled ? 'scrolled' : '', open ? 'nav-open' : ''].join(' ').trim()
+  // Every page opens with a dark/red hero, so the header rides "on-dark" (white
+  // logo + nav) at the top of all pages, then flips to the solid light header
+  // (red logo + dark nav) once scrolled past the hero.
+  const cls = ['on-dark', scrolled ? 'scrolled' : '', open ? 'nav-open' : ''].join(' ').trim()
 
   return (
     <header className={cls}>
       <div className="wrap nav">
         <Link to="/" className="brand" aria-label="TMS home">
           {/* White logo while over the dark hero at the top; red once scrolled. */}
-          <Logo color={isHome && !scrolled ? '#fff' : '#c1272d'} />
+          <Logo color={!scrolled ? '#fff' : '#c1272d'} />
           <span className="wordmark">TMS</span>
         </Link>
 
